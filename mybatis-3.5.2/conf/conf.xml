@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+<!--    用于引入外部properties配置文件的内容-->
+<!--    resource用于引入类路径下的资源,url用于引入网络上的资源-->
+<!--    <properties resource="dbconfig.properties" ></properties>-->
+
+<!--    -->
+    <settings>
+<!--        是否开启驼峰命令法  数据库命令使用下划线  java命名使用字母的大小写-->
+<!--        <setting name="mapUnderscoreToCamelCaseEnables" value="true"/>-->
+        <setting name="jdbcTypeForNull" value="NULL"/>
+<!--        开启延迟加载-->
+        <setting name="lazyLoadingEnabled" value="true"/>
+        <setting name="aggressiveLazyLoading" value="flase"/>
+<!--        开启二级缓存,无法通过修改参数来关闭一级缓存-->
+<!--        <setting name="cacheEnabled" value="true"/>-->
+    </settings>
+
+<!--       起别名  推荐还是使用全类名-->
+    <typeAliases>
+<!--       为某个包下批量起别名 类名的别名就为那个包下的类名(不区分小写字母形式)-->
+<!--        <package name="com.gp.entity"/>-->
+        <typeAlias type="com.gp.entity.Person" alias="person"></typeAlias>
+    </typeAliases>
+
+<!--    设置处理器-->
+    <typeHandlers>
+<!--        改变在数据库的存储方式,默认是枚举的name,这里将其改成枚举的索引-->
+<!--        <typeHandler handler="org.apache.ibatis.type.EnumOrdinalTypeHandler" javaType="com.gp.entity.Car"/>-->
+        <typeHandler handler="com.gp.entity.MyEnumHandler" javaType="com.gp.entity.Car"/>
+    </typeHandlers>
+
+    <!--    注册插件-->
+<!--    <plugins>-->
+<!--        <plugin interceptor="com.gp.plugin.MyPlugin">-->
+<!--            <property name="username" value="scott"/>-->
+<!--            <property name="password" value="tiger"/>-->
+<!--        </plugin>-->
+<!--    </plugins>-->
+
+    <!--    通过environments的default值与environment的id值配对来指定mybatis的数据库环境-->
+    <environments default="dev_oracle">
+
+        <environment id="dev_mysql">
+            <transactionManager type="JDBC" />
+
+            <dataSource type="POOLED">
+                <property name="driver" value="com.mysql.jdbc.Driver"/>
+                <property name="url" value="jdbc:mysql://localhost:3306/scott"/>
+                <property name="username" value="root"/>
+                <property name="password" value="root"/>
+            </dataSource>
+        </environment>
+
+        <environment id="dev_oracle">
+<!--            事务的提交方式
+                JDBC:利用JDBC处理事务(commit rollback close)
+                MANAGED:将事务交由其他组件去托管(spring ,jobss),默认情况下会关闭连接-->
+            <transactionManager type="JDBC"/>
+<!--            数据源类型  POOLED:使用数据库连接池
+                            UNPOOLED:使用传统的jdbc模式(不推荐使用该方式,影响性能)
+                            JNDI:从tomcat中获取一个内置的数据库连接池(数据源)-->
+            <dataSource type="POOLED">
+                <property name="driver" value="oracle.jdbc.OracleDriver"/>
+                <property name="url" value="jdbc:oracle:thin:@localhost:1521:ORCL"/>
+                <property name="username" value="scott"/>
+                <property name="password" value="tiger"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+<!--    下面的标签支持多种数据库厂商
+type="DB_VENDOR" 作用就是的单数据库厂商的标识,mybatis就能根据不同的厂商发送不同的sql语句
+        -->
+    <databaseIdProvider type="DB_VENDOR">
+<!--        起别名-->
+        <property name="Oracle" value="oracle"/>
+        <property name="MySQL" value="mysql"/>
+    </databaseIdProvider>
+
+    <mappers>
+<!--        加载mapper.xml映射文件
+class : 用于注册接口的方式  可用于注解的形式不用配置xml文件-->
+<!--        <mapper resource="xxxMapper.xml"/>-->
+        <mapper resource="DeptMapper.xml"/>
+        <mapper resource="EmployeeMapper.xml"/>
+        <mapper resource="personMapper.xml"/>
+        <mapper resource="EmployeeMapperDynamicSQL.xml"/>
+        <mapper resource="StudentMapper.xml/"/>
+        <mapper resource="AccountMapper.xml"/>
+    </mappers>
+</configuration>

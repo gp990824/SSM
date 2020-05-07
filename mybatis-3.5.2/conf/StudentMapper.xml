@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gp.mapper.StudentMapper">
+<!--    !!!!!!!!!!!!!!!!!!!千万注意SQL语句后边不要加分号!!!!!!!!!!!!!!!!!!!!!!-->
+    <select id="queryStudentById" resultType="com.gp.entity.Student">
+        select SNUM,SNAME,SAGE,SADDRESS from STUDENT where snum = #{id}
+    </select>
+<!--    可以用序列的方式模拟自增
+其中的selectKey标签可以用来通过序列查出主键id
+keyProperty:查出的主键封装给javabean的哪一个属性
+order="BEFORE" 在插入SQL语句中之前执行-->
+    <insert id="insertStudent" parameterType="com.gp.entity.Student" >
+        <selectKey keyProperty="snum" order="BEFORE" resultType="Integer">
+            select myseq.nextval from dual
+        </selectKey>
+        insert into STUDENT values(#{snum},#{sname},#{sage},#{saddress})
+    </insert>
+    <!--当传入多个参数时,mybatis会将参数封装成map-->
+    <select id="queryStudentByIdAndAge" resultType="com.gp.entity.Student">
+        select *from STUDENT where SNUM=#{id} and SAGE=#{age}
+    </select>
+<!--    返回map-->
+    <select id="queryStudentReturnMap" resultType="java.util.Map">
+        select *from STUDENT
+    </select>
+<!--    通过map传递参数 #{key} 里面的key就是map中的key-->
+    <select id="queryStudentByMap" resultType="com.gp.entity.Student">
+        select *from STUDENT where sname=#{sname} and snum=#{snum}
+    </select>
+    <delete id="deleteStudentById">
+        delete from STUDENT where SNUM = #{snum}
+    </delete>
+    <select id="queryAllStudent" resultType="com.gp.entity.Student">
+        select * from STUDENT
+    </select>
+    <update id="updateStudent">
+        update STUDENT set SNAME=#{sname},SAGE=#{sage},SADDRESS=#{saddress} where SNUM=#{snum}
+    </update>
+</mapper>

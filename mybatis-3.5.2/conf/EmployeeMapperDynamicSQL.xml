@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gp.mapper.EmployeeMapperDynamicSQL">
+    <resultMap id="emp" type="com.gp.entity.Employee">
+        <result column="empno" property="id"/>
+        <result column="ename" property="name"/>
+        <result column="job" property="job"/>
+    </resultMap>
+    <select id="queryAllEmployees" resultMap="emp">
+        select * from EMP
+    </select>
+    <!--    动态拼装sql-->
+    <select id="queryEmployeeByAll" resultType="com.gp.entity.Employee">
+        select * from EMP where 1=1
+        <if test="id!=null">
+            and EMPNO=#{id}
+        </if>
+        <if test="name!=null and name!=''">
+            and ENAME like #{name}
+        </if>
+        <if test="job!=null and job!=''">
+            and job = #{job}
+        </if>
+    </select>
+
+    <select id="queryEmployeeByChoose" resultType="com.gp.entity.Employee">
+        select * from EMP
+        <where>
+            <choose>
+                <when test="id!=null">
+                    empno=#{id}
+                </when>
+                <when test="name!=null">
+                    ename like #{name}
+                </when>
+                <when test="job!=null">
+                    job = #{job}
+                </when>
+                <otherwise>
+                    1=1
+                </otherwise>
+            </choose>
+        </where>
+    </select>
+
+    <update id="updateEmployee">
+        update EMP
+        <set>
+            <if test="name != null">
+                ENAME=#{name},
+            </if>
+            <if test="job != null">
+                JOB=#{job}
+            </if>
+        </set>
+        where empno=#{id}
+    </update>
+
+
+    <!--    传来的参数是一个list集合,使用foreach标签-->
+    <select id="queryEmployeeByList" resultMap="emp">
+        select *from EMP where empno in
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+<!--    <insert id="addEmployees">-->
+<!--        insert into EMP(empno, ename, job) values-->
+<!--        <foreach collection="list" separator="," item="emp">-->
+<!--            (#{emp.id},#{emp.name},#{emp.job})-->
+<!--        </foreach>-->
+<!--    </insert>-->
+<!--        或者使用下面这种方式-->
+        <insert id="addEmployees" >
+            <foreach collection="list" item="emp" open="begin" close="end;">
+                insert into EMP(empno, ename, job) values (#{emp.id},#{emp.name},#{emp.job});
+            </foreach>
+--              insert into EMP(empno, ename, job) values (#{id},#{name},#{job})
+        </insert>
+</mapper>

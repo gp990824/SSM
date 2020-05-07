@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace : 该映射文件唯一标识符-->
+<!--<mapper namespace="com.gp.entity.Person.personMapper">-->
+<mapper namespace="com.gp.mapper.PersonMapper">
+    <!-- 后续同过namespace.id来定位该SQL语句   resultType返回类型   paramterType为SQL语句中#{..}的类型-->
+    <select id="queryPersonById" resultType="person" parameterType="int" databaseId="oracle">
+        select * from Person where id = #{id}
+    </select>
+    <select id="insertPerson" parameterType="person">
+        insert into person values(#{id},#{name},#{age})
+    </select>
+<!--    无论返回的结果是一个还是多个只写返回值类型-->
+    <select id="queryTotalPerson" resultType="person">
+        select * from Person
+    </select>
+    <select id="delPerson" parameterType="int" >
+        delete from person where id =#{id}
+    </select>
+    <select id="updatePerson" parameterType="person">
+        update person set name=#{name},age=#{age} where id=#{id}
+    </select>
+</mapper>

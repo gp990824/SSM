@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gp.mapper.DeptMapper">
+    <select id="queryDeptByDeptno" resultType="com.gp.entity.Dept">
+        select dname name from dept where deptno =#{deptno}
+    </select>
+
+    <!--        返回类型的Javabean的属性有List类型,使用collection标签  一对多-->
+    <resultMap id="deptMap" type="com.gp.entity.Dept">
+        <result column="dname" property="name"/>
+        <collection property="empList" ofType="com.gp.entity.Employee">
+            <id column="empno" property="id"/>
+            <result column="ename" property="name"/>
+            <result column="job" property="job"/>
+        </collection>
+    </resultMap>
+    <select id="queryEmpByDeptno" resultMap="deptMap">
+        select d.dname,e.empno,e.ename,e.job from dept d
+        left join emp e on e.deptno=d.deptno
+        where d.deptno=#{id}
+    </select>
+
+    <!--    嵌套结果集的分布查询  -->
+    <resultMap id="deptMapStep" type="com.gp.entity.Dept">
+        <result column="dname" property="name"/>
+        <collection property="empList" select="com.gp.mapper.EmployeeMapper.queryEmployeeByDeptno"
+                    column="deptno"/>
+    </resultMap>
+    <select id="queryEmpByDeptnoStep" resultMap="deptMapStep">
+        select deptno, dname from dept where deptno=#{deptno}
+    </select>
+</mapper>

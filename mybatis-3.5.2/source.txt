@@ -1,0 +1,45 @@
+源码分析:
+全局配置文件
+Mapper映射文件
+解析全局配置文件  使用Resources.getResourceAsReader("全局配置文件");  返回Reader类型
+获取SqlSessionFactory对象   new SqlsessionFactoryBuilder().build(Reader对象); 返回SqlsessionFactory对象
+    解析文件的每一个信息保存在Configuration中,返回包含Configuration的DefaultSqlsession对象
+    注意:每一个[MappedStatement]代表一个增删改查的详细信息
+获取Sqlsession对象  SqlSessionFactory对象.openSession()  返回Sqlsession对象
+    返回DefaultSqlsession对象,包含Executor和Configuration
+    这一步会创建Executor对象
+获取接口实现类对象  SqlSession对象.getMapper(Mapper接口.class) 返回接口的实现类对象(其实是代理对象org.apache.ibatis.binding.MapperProxy@...)
+    getMapper,使用MapperProxyFactory创建一个MapperProxy的代理对象
+    代理对象包含了DefaultSqlsession(Executor)
+调用接口实现类对象(其实就是Mapper接口中的方法)
+Sqlsession对象.commit():
+Sqlsession对象.close();
+
+查询流程总结:(用了四大对象)
+    代理对象
+    DefaultSqlsession
+    Executor(一)
+    StatementHandler(二)
+        ParameterHandler(三)    设置参数等相关工作
+        ResultSetHandler(四)    处理结果集
+    TyepHandler    在整个过程中,进行数据库类型和Javabean类型的映射
+        底层就是jdbc的操作
+
+
+总结:
+    根据配置文件(全局,SQL映射)初始化Configuration对象(包含全局配置文件的所有信息)
+    创建一个DefaultSqlsession对象
+        里面包含Configuration以及Executor(根据全局配置文件中的defaultExecutorType创建对应的Executor)
+    DefaultSqlsession.getMapper(),拿到Mapper接口对应的MapperProxy
+    MapperProxy里面有DefaultSqlsession
+    执行增删改查方法
+        代理对象调用DefaultSqlsession的增删改查
+        会创建一个StatementHandler对象(同时也会创建ParameterHandler和ResultSetHandler对象)
+        调用StatementHandler预编译参数及设置参数
+            使用ParameterHandler来个SQL语句设置参数(借助了TypeHandler)
+        调用StatementHandler的增删改查方法
+        ResultSetHandler封装结果(也借助了TypeHandler)
+
+注意:
+    四大对象在创建的时候都有一行相同的代码:    interceptor.pluginAll(parameterHandler)
+    四大对象并不是直接返回的,而是调用了interceptor.pluginAll(parameterHandler)方法

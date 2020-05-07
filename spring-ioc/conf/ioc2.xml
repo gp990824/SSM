@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+<!--    javabean的对象的创建顺序就是bean标签写的先后顺序 depends-on="complexType,car"用来改变顺序-->
+    <bean class="com.gp.bean.Person" id="person" depends-on="complexType,car"/>
+    <bean class="com.gp.bean.Car" id="car"/>
+    <bean class="com.gp.bean.ComplexType" id="complexType" />
+
+<!--    bean的作用域,分别创建单实例和多实例
+prototype:多实例
+singleton:单实例(默认的),spring在加载ioc容器的时候就将对象创建好了
+-->
+    <bean class="com.gp.bean.Person" id="person2" scope="prototype"/>
+
+<!--    bean的创建默认是spring框架利用反射技术来实现的
+工厂模式:
+静态工厂:直接通过工厂类的静态方法调用来得到bean对象-->
+    <bean class="com.gp.factory.PlaneStaticFactory" id="factory" factory-method="getPlane">
+        <constructor-arg value="cn-007"/>
+    </bean>
+<!--    实例工厂-->
+    <bean class="com.gp.factory.PlaneInstanceFactory" id="factory2" />
+
+<!--    指定使用哪一个工厂 factory-bean="factory2"-->
+    <bean class="com.gp.bean.Plane" id="plane" factory-bean="factory2" factory-method="getPlane">
+        <constructor-arg value="ch-008"/>
+    </bean>
+
+<!--    获取FactoryBean对象-->
+    <bean class="com.gp.factory.CarFactoryImpl" id="carFactoryImpl"/>
+</beans>

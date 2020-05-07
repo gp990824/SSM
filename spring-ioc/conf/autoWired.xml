@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+<!--自动装配 @AutoWired(最强大 Spring标准 只能被spring框架使用)
+            @Resource(j2EE标准 扩展性更强 利于解耦)
+            @inject 都能自动装配-->
+    <context:component-scan base-package="com.gp"/>
+    <bean class="com.gp.bean.Test" scope="prototype">
+        <property name="id" value="1"/>
+    </bean>
+
+</beans>

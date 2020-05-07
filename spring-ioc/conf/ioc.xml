@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+<!--javabean 在ioc容器中是单实例的 ,对象的创建在加载ioc容器的时候就完成了-->
+    <bean class="com.gp.bean.Person" id="person">
+<!--        property赋值使用的是setter方法 name=javabean的setter方法(setAbc => abc)-->
+        <property name="name" value="张三"/>
+        <property name="age" value="22"/>
+    </bean>
+
+    <bean class="com.gp.bean.Person" id="person2">
+<!--        通过有参构造为属性赋值-->
+        <constructor-arg name="name" value="李四"/>
+        <constructor-arg name="age" value="33"/>
+    </bean>
+
+    <bean class="com.gp.bean.Person" id="person3">
+<!--        如果不使用name,顺序必须严格按照属性的顺序,否则使用index属性指定-->
+        <constructor-arg value="44" index="1"/>
+        <constructor-arg value="王五" index="0"/>
+    </bean>
+
+<!--    使用p命名空间赋值, 其实也是使用setter方法赋值-->
+    <bean class="com.gp.bean.Person" id="person4" p:name="赵六" p:age="55"/>
+
+<!--    赋值为null: <property><null/></property>-->
+    <bean class="com.gp.bean.Car" id="car">
+        <property name="carName" value="Benz"/>
+        <property name="color"  value="green"/>
+        <property name="price" value="350000"/>
+    </bean>
+<!--    为复杂属性赋值-->
+    <bean class="com.gp.bean.ComplexType" id="complexType">
+<!--        引用类型可以使用ref属性赋值-->
+<!--        <property name="car" ref="car"/>-->
+        <property name="car">
+            <bean class="com.gp.bean.Car">
+                <property name="carName" value="BMW"/>
+                <property name="price" value="320000"/>
+                <property name="color" value="Red"/>
+            </bean>
+        </property>
+
+<!--        给List属性赋值-->
+        <property name="cars">
+            <list>
+                <bean class="com.gp.bean.Car">
+                    <property name="carName" value="Audi"/>
+                    <property name="color" value="Black"/>
+                    <property name="price" value="400000"/>
+                </bean>
+                <ref bean="car"/>
+            </list>
+        </property>
+
+<!--        给HashMap属性赋值-->
+        <property name="map" ref="Mymap" />
+
+<!--        给数组类型赋值-->
+        <property name="hobbies">
+            <array value-type="java.lang.String">
+                <value>奥利给</value>
+                <value>臭豆腐</value>
+                <value>腐乳</value>
+            </array>
+        </property>
+    </bean>
+
+<!-- 使用util命名空间给集合属性赋值   -->
+    <util:map id="Mymap" key-type="java.lang.String" value-type="java.lang.Object">
+        <entry key="k1" value="v1"/>
+        <entry key="k2" value="v2"/>
+        <entry key="k3" value-ref="car"/>
+        <entry key="k4" >
+            <bean class="com.gp.bean.Car">
+                <property name="carName" value="Farreri"/>
+                <property name="price" value="4500000"/>
+                <property name="color" value="Red"/>
+            </bean>
+        </entry>
+    </util:map>
+<!--    级联属性赋值-->
+    <bean class="com.gp.bean.ComplexType" id="complexType2" >
+        <property name="car" ref="car"/>
+        <property name="car.carName" value="Lamborghni"/>
+    </bean>
+
+<!--    继承实现bean配置信息的重用 使用abstract=true属性表示该bean只能被继承,无法被实现(ioc.getBean无法拿到对象)-->
+    <bean class="com.gp.bean.Person" id="person5" abstract="true">
+        <property name="age" value="21"/>
+        <property name="name" value="孙狗"/>
+    </bean>
+<!--    其他属性的值继承自person5-->
+    <bean class="com.gp.bean.Person" id="person6" parent="person5">
+        <property name="name" value="曾狗"/>
+    </bean>
+</beans>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:contxt="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+<!--    利用aop配置声明式事务-->
+    <contxt:component-scan base-package="com.gp"/>
+
+    <bean class="com.mchange.v2.c3p0.ComboPooledDataSource" id="dataSource">
+        <property name="password" value="tiger"/>
+        <property name="user" value="scott"/>
+        <property name="jdbcUrl" value="jdbc:oracle:thin:@localhost:1521:ORCL"/>
+        <property name="driverClass" value="oracle.jdbc.OracleDriver"/>
+    </bean>
+
+    <bean class="org.springframework.jdbc.core.JdbcTemplate" id="jdbcTemplate">
+        <constructor-arg ref="dataSource" name="dataSource"/>
+    </bean>
+
+<!--    事务控制:  1.配置事务控制器-->
+    <bean class="org.springframework.jdbc.datasource.DataSourceTransactionManager" id="transactionManager">
+<!--        控制数据源-->
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+<!--    2.开启基于注解的事务控制!  对应的注解是: @EnableTransactionManagement(标注在配置类上)-->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+<!--    给事务方法加注解  如果该类中有被注解的事务方法,则spring会将该类实现成代理对象-->
+
+</beans>

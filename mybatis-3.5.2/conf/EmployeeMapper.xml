@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gp.mapper.EmployeeMapper">
+<!--   eviction="" 缓存的回收策略,默认是LRU 可选:FIFO LRU SOFT -->
+<!--    <cache size="1024" flushInterval="60000" ></cache>-->
+
+<!--    返回的类型的属性有引用类型, 一对一  使用associate标签-->
+    <resultMap id="empMap" type="com.gp.entity.Employee">
+        <id column="empno" property="id" />
+        <result column="ename" property="name"/>
+        <result column="job" property="job"/>
+        <association property="dept" javaType="com.gp.entity.Dept">
+            <result column="dname" property="name"/>
+        </association>
+    </resultMap>
+    <select id="queryEmployeeById" resultMap="empMap">
+        select e.empno,e.ename,e.job,d.dname from
+        emp e,dept d where e.deptno = d.deptno and e.empno=#{id}
+    </select>
+
+
+<!--    分布查询 在associate中使用select属性-->
+    <resultMap id="deptMap" type="com.gp.entity.Employee">
+        <id column="empno" property="id" />
+        <result column="ename" property="name"/>
+        <result column="job" property="job"/>
+<!--        根据这列deptno查出来的值作为参数传入select中的SQL语句中-->
+        <association property="dept"
+        select="com.gp.mapper.DeptMapper.queryDeptByDeptno"
+        column="deptno"/>
+    </resultMap>
+    <select id="queryEmployeeByEmpno" resultMap="deptMap">
+        select empno,ename,job,deptno from EMP where empno=#{empno}
+    </select>
+
+<!--    根据部门编号查询员工-->
+    <resultMap id="empBydeptMap" type="com.gp.entity.Employee">
+        <id column="empno" property="id"/>
+        <result column="ename" property="name"/>
+        <result column="job" property="job"/>
+    </resultMap>
+    <select id="queryEmployeeByDeptno" resultMap="empBydeptMap">
+        select empno ,ename, job from EMP where DEPTNO=#{deptno}
+    </select>
+</mapper>

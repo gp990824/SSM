@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--    创建带有生命周期的bean
+    单实例:在加载ioc容器的时候就会自动调用bean的初始化方法  在ioc容器被关闭的时候就会调用销毁方法
+    多实例:只有在被获取的时候才会调用bean的初始化方法(并不会调用销毁方法)-->
+    <bean class="com.gp.bean.Plane" id="plane" destroy-method="destroy" init-method="init" scope="prototype"/>
+
+    <!--    添加后置处理器  在bean调用初始化方法的前后工作-->
+<!--    <bean class="com.gp.processors.MyBeanPostProcessors" id="processors"/>-->
+
+    <!--    引用外部属性文件
+    数据库的连接池对象作为单例是最好的,一个项目就一个连接池,连接池里面管理很多连接
+    可以让spring帮我们创建连接池对象-->
+    <bean class="com.mchange.v2.c3p0.ComboPooledDataSource" id="dataSource" >
+        <property name="password" value="${oracle.password}"/>
+        <!--    不能使用username  因为其为spring的一个关键字    <property name="user" value="${oracle.username}"/>-->
+        <property name="user" value="${oracle.username}"/>
+        <property name="jdbcUrl" value="${oracle.url}"/>
+        <property name="driverClass" value="${oracle.driver}"/>
+    </bean>
+
+    <!--    使用context命名空间加载外部配置文件-->
+    <context:property-placeholder location="classpath:dbconf.properties"/>
+
+    <!--    自动装配
+    byName:根据名字自动赋值
+    byType:根据类型自动赋值
+    byConstructer:根据构造器赋值-->
+    <bean class="com.gp.bean.Car" id="car2" autowire="byName"/>
+
+    <!--    spel spring expression language-->
+    <bean class="com.gp.bean.Person" id="person3">
+        <property name="age" value="#{11*2}"/>
+        <!--        静态方法的调用-->
+        <!--        <property name="name" value="#{T(java.util.UUID).randomUUID().toString()}"/>-->
+<!--       非静态方法的调用value="#{car3.carName} 或car3.getCarName()-->
+        <property name="name" value="#{car3.carName}"/>
+    </bean>
+    <bean class="com.gp.bean.Car" id="car3">
+        <property name="carName" value="Ford"/>
+    </bean>
+
+<!--    通过注解的形式将bean注册到ioc容器中
+@Controller:用于控制层
+@Service:用于逻辑层
+@Repository:用于持久层
+@Component:上面三者以外的类
+spring底层不会区分这些注解,只是推荐奖合适的注解用在合适的类上-->
+
+<!--    通过context命名空间指定spring扫描哪个包下的类是否通过注解将其注册到ioc容器中-->
+    <context:component-scan base-package="com.gp">
+<!--        将expression包含的type类型全类名排出ioc容器中-->
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Service"/>
+    </context:component-scan>
+
+
+</beans>
