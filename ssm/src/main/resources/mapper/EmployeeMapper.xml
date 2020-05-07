@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gp.dao.EmployeeMapper">
+    <resultMap id="empMap" type="com.gp.bean.Employee">
+        <id property="id" column="id" />
+        <result column="name" property="name"/>
+        <result property="gender" column="gender"/>
+        <result column="email" property="email"/>
+        <association property="dept" select="com.gp.dao.DeptMapper.queryDeptById" column="dept_id"/>
+    </resultMap>
+    <select id="queryEmpAndDept" resultMap="empMap">
+        select * from EMP order by id asc
+    </select>
+    <insert id="insertEmp" parameterType="com.gp.bean.Employee">
+        insert into EMP values (EMPSEQ.nextval,#{name},#{gender},#{email},#{dept.id})
+    </insert>
+    <delete id="delEmpById">
+        delete from emp where ID=#{id}
+    </delete>
+</mapper>
